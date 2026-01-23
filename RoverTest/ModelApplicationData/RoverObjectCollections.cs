@@ -23,10 +23,10 @@ namespace RoverTest.ModelApplicationData
         public void RegisterCollections()
         {
             Type derivedType = this.GetType();
-            Assembly assembly = Assembly.GetAssembly(derivedType);
+            Assembly.GetAssembly(derivedType);
 
-            var typesWithMyAttribute = assembly.GetTypes()
-                .Where(t => t.GetCustomAttribute<RoverCollectionAttribute>() != null);
+
+            var typesWithMyAttribute = RoverInternals.GetDerivedClasses<RoverObjectCollection>();
 
             foreach (var type in typesWithMyAttribute)
             {

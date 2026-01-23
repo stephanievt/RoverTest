@@ -7,8 +7,10 @@ namespace RoverTest
     // I can't do this directly in implementation. I have stuff I want to override.
     // So make this ROVER a something that is implemented in 
     // the model.
-    // For now, since it is shorter, I am calling it ecm for 
-    public abstract class RoverEcm
+    // For now, since it is shorter, I am calling it ecu for
+    //ECU (Electronic Control Unit): The general term for any computer module in a car, controlling various systems.
+    // after the rover vehicle metaphor
+    public abstract class RoverEcu
     {
         // This is kinda arbitrary. I don't know how to think of these things yet.
         // "DRIVER" vs feature file vs whatever... probably overthinking.
@@ -21,7 +23,7 @@ namespace RoverTest
 
         public List<RoverObjectCollection> RoverObjectCollections = [];
 
-        protected RoverEcm(AppDriver appDriver)
+        protected RoverEcu(AppDriver appDriver)
         {
             AppDriver = appDriver;
             // ReSharper disable once VirtualMemberCallInConstructor
