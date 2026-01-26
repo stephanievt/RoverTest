@@ -13,6 +13,8 @@ namespace RoverTest.ModelUserInterface
 
     public abstract class RoverPageBase
     {
+        public RoverPageAction LastRoverPageAction { get; set; }
+
         // ReSharper disable once VirtualMemberCallInConstructor
         protected RoverPageBase()
         {

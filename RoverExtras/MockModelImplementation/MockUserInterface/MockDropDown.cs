@@ -11,12 +11,12 @@ namespace RoverExtras.MockModelImplementation.MockUserInterface
 
         public void SelectItem(int id)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Item Selected: " + id);
         }
 
         public void SelectItem(string itemName)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Item Selected: " + itemName);
         }
     }
 }
