@@ -16,4 +16,13 @@
     <ProjectReference Include="..\RoverTest\RoverTest.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="MockModelImplementation\MockBusinessObjects\TestEnvironmentData\Categories.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="MockModelImplementation\MockBusinessObjects\TestEnvironmentData\Items.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -3,12 +3,17 @@ using RoverTest.ModelApplicationData;
 
 namespace RoverExtras.MockModelImplementation.MockBusinessObjects
 {
-    //TODO: I probably do not need an attribute. I can get 'em
-    // from is a rover object collection.
-    [RoverCollection]
+
     public class Items : RoverObjectCollection, IEnumerable<Item>
     {
-        private readonly List<Item> _items = [];
+        private readonly List<Item> _items;
+
+        public Items()
+        {
+            _items = LoadRoverData<Item>();
+        }
+
+        public int Count => _items.Count;
 
         public void Add(Item item)
         {
