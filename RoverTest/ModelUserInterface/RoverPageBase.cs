@@ -23,9 +23,9 @@ namespace RoverTest.ModelUserInterface
 
         public List<RoverPageAction> AccessedRoverPageActionsStack { get; set; } = [];
 
-        public AppDriver AppDriver => RoverDriveTrain.AppDriver;
+        public AppDriver AppDriver => RoverEcu.AppDriver;
 
-        public RoverDriveTrain RoverDriveTrain { get; set; }
+        public RoverEcu RoverEcu { get; set; }
 
         public abstract string Url { get; set; }
 
@@ -47,7 +47,7 @@ namespace RoverTest.ModelUserInterface
                 RoverPage = this
             };
 
-            RoverDriveTrain.AccessedPageStack.Add(currentPageForStack);
+            RoverEcu.AccessedPageStack.Add(currentPageForStack);
         }
 
 

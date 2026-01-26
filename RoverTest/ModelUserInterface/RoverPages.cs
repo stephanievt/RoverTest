@@ -11,9 +11,9 @@ namespace RoverTest.ModelUserInterface
 
         internal string _className;
 
-        public RoverDriveTrain RoverDriveTrain { get; set; }
+        public RoverEcu RoverEcu { get; set; }
 
-        public AppDriver AppDriver => RoverDriveTrain.AppDriver;
+        public AppDriver AppDriver => RoverEcu.AppDriver;
 
         // This is a string of KEYS which is the class name with the value 
         // of a fully qualified string to create the page instance.

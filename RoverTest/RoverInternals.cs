@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 
 namespace RoverTest
 {
@@ -20,6 +21,33 @@ namespace RoverTest
                 $"but was expected to be '{typeof(T).FullName}'.");
         }
 
+        public static IEnumerable<Type> GetDerivedClasses<T>() where T : class
+        {
+            var baseType = typeof(T);
 
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(assembly =>
+                {
+                    try
+                    {
+                        return assembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        // Handle partially loadable assemblies safely
+                        return ex.Types.Where(t => t != null)!;
+                    }
+                })
+                .Where(type =>
+                    type is not null &&
+                    type.IsClass &&
+                    !type.IsAbstract &&
+                    baseType.IsAssignableFrom(type) &&
+                    type != baseType);
+            
+        }
+
+       
     }
 }
