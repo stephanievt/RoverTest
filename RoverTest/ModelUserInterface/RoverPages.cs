@@ -1,12 +1,10 @@
 ﻿using System.Reflection;
+using System.Runtime;
 
 namespace RoverTest.ModelUserInterface
 {
-    /// <summary>
-    /// Rover Page Factory. ABSTRACTED class that
-    /// is exposed to and implemented by the rover consumer app automation.
-    /// </summary>
-    public abstract class RoverPages
+
+    public class RoverPages
     {
 
         internal string _className;
@@ -19,7 +17,7 @@ namespace RoverTest.ModelUserInterface
         // of a fully qualified string to create the page instance.
         public Dictionary<string, string> Pages { get; } = [];
 
-        protected RoverPages()
+        public RoverPages()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             RegisterPages();
@@ -27,7 +25,24 @@ namespace RoverTest.ModelUserInterface
             _className = derivedType.Name;
         }
 
-        public abstract RoverPageBase GetPage(string pageName);
+        public RoverPageBase GetPage(string pageName)
+        {
+            bool registered = Pages.ContainsKey(pageName);
+            if (!registered) throw new AmbiguousImplementationException("No rover page by that name.");
+
+            List<Type> theTypes = RoverInternals.GetDerivedClasses<RoverPageBase>().ToList();
+            RoverPageBase returnObject = null;
+            foreach (var currentType in theTypes)
+            {
+                if (pageName == currentType.Name)
+                {
+                    returnObject = (RoverPageBase)Activator.CreateInstance(currentType);
+                    break;
+                }
+            }
+
+            return returnObject;
+        }
 
         /// <summary>
         /// Users of this framework will add pages (POM abstraction) to the list by class name
@@ -38,10 +53,12 @@ namespace RoverTest.ModelUserInterface
             Type derivedType = this.GetType();
             Assembly assembly = Assembly.GetAssembly(derivedType);
 
-            var typesWithMyAttribute = assembly.GetTypes()
-                .Where(t => t.GetCustomAttribute<RoverPageAttribute>() != null);
+            //var typesWithMyAttribute = assembly.GetTypes()
+            //    .Where(t => t.GetCustomAttribute<RoverPageAttribute>() != null);
 
-            foreach (var type in typesWithMyAttribute)
+            var derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>();
+
+            foreach (var type in derivedTypes)
             {
                 string typeFullName = type.FullName;
                 string typeName = type.Name;
