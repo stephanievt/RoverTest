@@ -2,7 +2,7 @@
 
 namespace RoverExtras.MockModelImplementation.MockUserInterface
 {
-    public class PageHome : RoverPageBase
+    public class MockPageHome : RoverPageBase
     {
         public override string Url { get; set; }
         public override IElement PageIdentifier { get; } = new MockElement();
