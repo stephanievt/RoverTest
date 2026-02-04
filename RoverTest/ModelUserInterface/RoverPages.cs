@@ -53,9 +53,7 @@ namespace RoverTest.ModelUserInterface
             Type derivedType = this.GetType();
             Assembly assembly = Assembly.GetAssembly(derivedType);
 
-            //var typesWithMyAttribute = assembly.GetTypes()
-            //    .Where(t => t.GetCustomAttribute<RoverPageAttribute>() != null);
-
+           
             var derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>();
 
             foreach (var type in derivedTypes)

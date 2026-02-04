@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace RoverTest
 {
-    public class RoverInternals
+    public class RoverInternals 
     {
         public static List<T> DeserializeJsonArray<T>(string json)
         {
