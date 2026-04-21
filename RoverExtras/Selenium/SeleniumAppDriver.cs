@@ -8,7 +8,7 @@ namespace RoverExtras.Selenium
     public class SeleniumAppDriver : AppDriver
     {
         private readonly IWebDriver _webDriver;
-        public sealed override object Driver { get; set; }
+        public sealed override object Driver { get; }
         public override void Dispose()
         {
             _webDriver.Close();

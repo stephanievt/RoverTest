@@ -13,11 +13,14 @@ namespace RoverTest.ModelUserInterface
 
     public abstract class RoverPageBase
     {
+        private readonly AppDriver _appDriver;
+        
         public RoverPageAction LastRoverPageAction { get; set; }
 
         // ReSharper disable once VirtualMemberCallInConstructor
-        protected RoverPageBase()
+        protected RoverPageBase(AppDriver appDriver)
         {
+            _appDriver = appDriver;
             RegisterRoverPageActions();
         }
 
@@ -25,34 +28,14 @@ namespace RoverTest.ModelUserInterface
 
         public List<RoverPageAction> AccessedRoverPageActionsStack { get; set; } = [];
 
-        public AppDriver AppDriver => RoverEcu.AppDriver;
-
-        public RoverEcu RoverEcu { get; set; }
-
-        public abstract string Url { get; set; }
+        //TODO Why did I add Url to PAGE base? 
+        //public abstract string Url { get; set; }
 
         public abstract IElement PageIdentifier { get; }
 
         public abstract bool Exists { get; }
 
-        public abstract void Open();
-
-        
-        protected void RegisterWithRoverTest()
-        {
-            // get derived type 
-            var thisType = this.GetType();
-            RoverPageStack currentPageForStack = new RoverPageStack()
-            {
-                FullName = thisType.FullName,
-                Name = thisType.Name,
-                RoverPage = this
-            };
-
-            RoverEcu.AccessedPageStack.Add(currentPageForStack);
-        }
-
-
+       
         public void RegisterRoverPageActions()
         {
             Type derivedType = this.GetType();

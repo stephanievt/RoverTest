@@ -6,8 +6,7 @@
     /// <param name="location"></param>
     public abstract class AppDriver(string location)
     {
-
-        public abstract object Driver { get; set; }
+        public abstract object Driver { get; }
 
         public string Location { get; private set; } = location;
 
