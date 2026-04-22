@@ -1,19 +1,22 @@
 ﻿using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Conditions;
+using FlaUI.UIA3;
 using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.FlaUI
 {
 
     //FlaUI has a neat set of elements. Add as we go.
-
     public class Element : IElement
     {
-
+        private static ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
         private readonly AutomationElement _automationElement;
 
-        public Element(AutomationElement automationElement)
+        public Element(FlaUIAppDriver flauiAppDriver)
         {
-            _automationElement = automationElement;
+            PropertyCondition condition = cf.ByAutomationId("40");
+            AutomationElement foundElement = flauiAppDriver.MainWindow.FindFirstDescendant(condition);
+            _automationElement = foundElement;
         }
 
         public bool Visible => _automationElement?.IsAvailable == true &&
@@ -33,7 +36,7 @@ namespace RoverExtras.FlaUI
 
         public string Text => _automationElement.AsLabel()?.Text ?? string.Empty;
 
-       
-
+        
+        
     }
 }
