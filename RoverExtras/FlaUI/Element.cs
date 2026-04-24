@@ -1,8 +1,10 @@
 ﻿using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
-using FlaUI.UIA3;
 using RoverTest.ModelUserInterface;
 using System.Reflection;
+using FlaUI.Core.Tools;
+using FlaUI.UIA3;
+
 
 namespace RoverExtras.FlaUI
 {
@@ -69,14 +71,12 @@ namespace RoverExtras.FlaUI
                 }
             }
 
-            // Fallback to default if no attribute found
-            PropertyCondition condition = cf.ByAutomationId("40");
-            return flauiAppDriver.MainWindow.FindFirstDescendant(condition);
+            throw new Exception("No property with FlaUIFinder attribute found in the call stack.");
         }
 
         private AutomationElement FindElementByAttribute(FlaUIAppDriver flauiAppDriver, FlaUIFinder finder)
         {
-            ConditionBase condition = null;
+            ConditionBase condition;
 
             // Build condition based on SearchTech
             switch (finder.SearchTech)
@@ -92,13 +92,18 @@ namespace RoverExtras.FlaUI
                     break;
                 case FlauiSearchTech.ByXPath:
                     // XPath requires different handling
-                    return flauiAppDriver.MainWindow.FindFirstByXPath(finder.FinderString);
+                    return flauiAppDriver.FlaUiStartupWindow.FindFirstByXPath(finder.FinderString);
                 default:
-                    condition = cf.ByAutomationId(finder.FinderString);
-                    break;
+                    throw new Exception("Search Tech not found.");
             }
 
-            return flauiAppDriver.MainWindow.FindFirstDescendant(condition);
+            //TODO: Magic number for timeout, consider making this configurable
+            flauiAppDriver.FlaUiStartupWindow.FindAllChildren();
+            var thingy = Retry.WhileNull(() =>
+                    flauiAppDriver.FlaUiStartupWindow.FindFirstDescendant(condition),
+                timeout: TimeSpan.FromSeconds(60)).Result;
+            return thingy;
+
         }
 
 
