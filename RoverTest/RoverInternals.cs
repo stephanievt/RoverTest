@@ -1,15 +1,14 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace RoverTest
 {
-    public class RoverInternals 
+    public class RoverInternals
     {
         public static List<T> DeserializeJsonArray<T>(string json)
         {
             return JsonSerializer.Deserialize<List<T>>(json);
-            
+
         }
 
         public static T GetTypedObject<T>(object untypedObject)
@@ -25,6 +24,8 @@ namespace RoverTest
         public static IEnumerable<Type> GetDerivedClasses<T>() where T : class
         {
             var baseType = typeof(T);
+            // Force load all assemblies from the application directory
+            LoadAllAssemblies();
 
             return AppDomain.CurrentDomain
                 .GetAssemblies()
@@ -46,9 +47,31 @@ namespace RoverTest
                     !type.IsAbstract &&
                     baseType.IsAssignableFrom(type) &&
                     type != baseType);
-            
+
         }
 
-       
+        private static void LoadAllAssemblies()
+        {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var loadedPaths = loadedAssemblies.Where(a => !a.IsDynamic).Select(a => a.Location).ToHashSet();
+
+            var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
+
+            foreach (var path in referencedPaths)
+            {
+                if (!loadedPaths.Contains(path))
+                {
+                    try
+                    {
+                        Assembly.LoadFrom(path);
+                    }
+                    catch
+                    {
+                        // Ignore assemblies that can't be loaded (native, incompatible, etc.)
+                    }
+                }
+            }
+
+        }
     }
 }

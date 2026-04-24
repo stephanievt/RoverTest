@@ -1,0 +1,11 @@
+Updating nuget
+- Update PropertyGroup/Version in project file XML.
+
+
+
+dotnet nuget push C:\Dev\RoverNet\RoverTest\bin\Release\RoverTest.1.0.5.nupkg --api-key oy2oeoxw3cx5lb52bhjasgaxq7mdohrulhpppyugzztup4 --source https://api.nuget.org/v3/index.json
+dotnet nuget push C:\Dev\RoverNet\RoverExtras\bin\Release\RoverExtras.1.0.5.nupkg --api-key oy2oeoxw3cx5lb52bhjasgaxq7mdohrulhpppyugzztup4 --source https://api.nuget.org/v3/index.json
+
+
+My API Key
+oy2oeoxw3cx5lb52bhjasgaxq7mdohrulhpppyugzztup4
