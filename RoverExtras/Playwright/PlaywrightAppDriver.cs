@@ -26,6 +26,11 @@ namespace RoverExtras.Playwright
         // I will do this instance and abstract out the playwright bits later,
         // but for now this is just a wrapper around the playwright page
         public override object Driver => page;
+        public override async Task NavigateAsync()
+        {
+            await page.GotoAsync(Location);
+        }
+
         public override void Dispose()
         {
             page.CloseAsync().GetAwaiter().GetResult();

@@ -3,6 +3,7 @@
     public class RoverPageFactory
     {
         internal string _className;
+        private readonly Dictionary<Type, Type> _interfaceToImplementationMap = new();
 
         // This is a string of KEYS which is the class name with the value 
         // of a fully qualified string to create the page instance.
@@ -18,10 +19,49 @@
         }
 
         // New generic method to return the specific page type
-        public T GetPage<T>() where T : RoverPageBase
+        public T GetPage<T>() where T : class
         {
-            Type pageType = typeof(T);
+            Type requestedType = typeof(T);
+            Type pageType;
+
+            // If T is an interface, resolve it to a concrete implementation
+            if (requestedType.IsInterface)
+            {
+                if (_interfaceToImplementationMap.TryGetValue(requestedType, out var implementationType))
+                {
+                    pageType = implementationType;
+                }
+                else
+                {
+                    // Auto-discover: Find a class that implements this interface and derives from RoverPageBase
+                    pageType = RoverInternals.GetDerivedClasses<RoverPageBase>()
+                        .FirstOrDefault(t => requestedType.IsAssignableFrom(t));
+
+                    if (pageType == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"No implementation found for interface {requestedType.Name}. " +
+                            $"Register it using RegisterImplementation<{requestedType.Name}, TImplementation>()");
+                    }
+
+                    // Cache for future use
+                    _interfaceToImplementationMap[requestedType] = pageType;
+                }
+            }
+            else
+            {
+                pageType = requestedType;
+            }
+
             return (T)Activator.CreateInstance(pageType, AppDriver);
+        }
+
+        // Allow explicit registration of interface-to-implementation mappings
+        public void RegisterImplementation<TInterface, TImplementation>()
+            where TInterface : class
+            where TImplementation : RoverPageBase, TInterface
+        {
+            _interfaceToImplementationMap[typeof(TInterface)] = typeof(TImplementation);
         }
 
         /// <summary>

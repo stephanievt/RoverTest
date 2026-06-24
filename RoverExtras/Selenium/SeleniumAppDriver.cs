@@ -9,6 +9,11 @@ namespace RoverExtras.Selenium
     {
         private readonly IWebDriver _webDriver;
         public sealed override object Driver { get; }
+        public override Task NavigateAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Dispose()
         {
             _webDriver.Close();

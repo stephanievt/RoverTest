@@ -10,6 +10,11 @@
 
         public string Location { get; private set; } = location;
 
+        /// <summary>
+        /// Navigates to the application location
+        /// </summary>
+        public abstract Task NavigateAsync();
+
         // This method allows implementation to clean up 
         public abstract void Dispose();
     }
