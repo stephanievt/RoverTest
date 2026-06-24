@@ -1,4 +1,4 @@
-﻿namespace RoverNet.ModelUserInterface
+﻿namespace RoverTest.ModelUserInterface
 {
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class RoverDataCollectionAttribute(string name) : Attribute

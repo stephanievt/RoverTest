@@ -1,11 +1,7 @@
-﻿using System.Runtime;
-
-namespace RoverTest.ModelUserInterface
+﻿namespace RoverTest.ModelUserInterface
 {
-
     public class RoverPageFactory
     {
-
         internal string _className;
 
         // This is a string of KEYS which is the class name with the value 
@@ -21,20 +17,11 @@ namespace RoverTest.ModelUserInterface
             _className = derivedType.Name;
         }
 
-        public RoverPageBase GetPage(string pageName)
+        // New generic method to return the specific page type
+        public T GetPage<T>() where T : RoverPageBase
         {
-            List<Type> theTypes = RoverInternals.GetDerivedClasses<RoverPageBase>().ToList();
-            RoverPageBase returnObject = null;
-            foreach (var currentType in theTypes)
-            {
-                if (pageName == currentType.Name)
-                {
-                    returnObject = (RoverPageBase)Activator.CreateInstance(currentType, AppDriver);
-                    break;
-                }
-            }
-
-            return returnObject;
+            Type pageType = typeof(T);
+            return (T)Activator.CreateInstance(pageType, AppDriver);
         }
 
         /// <summary>
@@ -51,9 +38,6 @@ namespace RoverTest.ModelUserInterface
                 string typeName = type.Name;
                 Pages.Add(typeName, typeFullName);
             }
-           
         }
-
-        
     }
 }
