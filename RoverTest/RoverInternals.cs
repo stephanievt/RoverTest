@@ -21,26 +21,28 @@ namespace RoverTest
                 $"but was expected to be '{typeof(T).FullName}'.");
         }
 
-        public static IEnumerable<Type> GetDerivedClasses<T>() where T : class
+        public static IEnumerable<Type> GetDerivedClasses<T>(Assembly targetAssembly = null) where T : class
         {
             var baseType = typeof(T);
-            // Force load all assemblies from the application directory
+            
+            // If a specific assembly is provided, only search that assembly
+            if (targetAssembly != null)
+            {
+                return GetTypesFromAssembly(targetAssembly)
+                    .Where(type =>
+                        type is not null &&
+                        type.IsClass &&
+                        !type.IsAbstract &&
+                        baseType.IsAssignableFrom(type) &&
+                        type != baseType);
+            }
+
+            // Otherwise, search all assemblies (original behavior)
             LoadAllAssemblies();
 
             return AppDomain.CurrentDomain
                 .GetAssemblies()
-                .SelectMany(assembly =>
-                {
-                    try
-                    {
-                        return assembly.GetTypes();
-                    }
-                    catch (ReflectionTypeLoadException ex)
-                    {
-                        // Handle partially loadable assemblies safely
-                        return ex.Types.Where(t => t != null)!;
-                    }
-                })
+                .SelectMany(assembly => GetTypesFromAssembly(assembly))
                 .Where(type =>
                     type is not null &&
                     type.IsClass &&
@@ -48,6 +50,19 @@ namespace RoverTest
                     baseType.IsAssignableFrom(type) &&
                     type != baseType);
 
+        }
+
+        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Handle partially loadable assemblies safely
+                return ex.Types.Where(t => t != null)!;
+            }
         }
 
         private static void LoadAllAssemblies()

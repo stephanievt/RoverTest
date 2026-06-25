@@ -45,7 +45,8 @@
         /// </summary>
         public void RegisterPages()
         {
-            IEnumerable<Type> derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>();
+            // Only get derived types from the same assembly as the AppDriver
+            IEnumerable<Type> derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>(AppDriver.GetType().Assembly);
 
             foreach (var type in derivedTypes)
             {
