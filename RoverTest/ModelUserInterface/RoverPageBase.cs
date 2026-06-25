@@ -83,5 +83,41 @@ namespace RoverTest.ModelUserInterface
                 throw new InvalidOperationException($"Action '{actionName}' not found on page {GetType().Name}");
             }
         }
+
+        /// <summary>
+        /// Takes a screenshot of the current page
+        /// </summary>
+        /// <returns>Screenshot as byte array (PNG format)</returns>
+        public byte[] TakeScreenshot()
+        {
+            return AppDriver.TakeScreenshot();
+        }
+
+        /// <summary>
+        /// Takes a screenshot and saves it to a file
+        /// </summary>
+        /// <param name="filePath">Full path where the screenshot should be saved</param>
+        public void TakeScreenshot(string filePath)
+        {
+            var screenshotBytes = AppDriver.TakeScreenshot();
+
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllBytes(filePath, screenshotBytes);
+        }
+
+        /// <summary>
+        /// Takes a screenshot and returns as base64 string for embedding in HTML reports
+        /// </summary>
+        /// <returns>Base64 encoded PNG image</returns>
+        public string TakeScreenshotAsBase64()
+        {
+            var screenshotBytes = AppDriver.TakeScreenshot();
+            return Convert.ToBase64String(screenshotBytes);
+        }
     }
 }

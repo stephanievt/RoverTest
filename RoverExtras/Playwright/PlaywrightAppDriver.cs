@@ -39,6 +39,15 @@ namespace RoverExtras.Playwright
             playwright.Dispose();
         }
 
+        public override byte[] TakeScreenshot()
+        {
+            return page.ScreenshotAsync(new PageScreenshotOptions
+            {
+                FullPage = true,
+                Type = ScreenshotType.Png
+            }).GetAwaiter().GetResult();
+        }
+
         public async Task Load()
         {
 
