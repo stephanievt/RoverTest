@@ -1,5 +1,7 @@
 ﻿using Microsoft.Playwright;
+using RoverExtras.Playwright.PlaywrightAttributes;
 using RoverTest.ModelUserInterface;
+using System.Reflection;
 
 namespace RoverExtras.Playwright
 {
@@ -97,5 +99,46 @@ namespace RoverExtras.Playwright
         }
 
         public string Text => Locator.TextContentAsync().GetAwaiter().GetResult() ?? string.Empty;
+
+        /// <summary>
+        /// Initializes all properties with [LocateBy] attributes on a page object.
+        /// This method uses reflection to find the appropriate Element type in the page's namespace.
+        /// </summary>
+        public static void InitializeElements<TPage>(TPage page, PlaywrightAppDriver driver) where TPage : class
+        {
+            Type pageType = typeof(TPage);
+            PropertyInfo[] properties = pageType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            // Find Element type in the page's assembly - look for [Namespace].OnscreenElements.Element
+            var elementTypeName = $"{pageType.Namespace}.OnscreenElements.Element";
+            var elementType = pageType.Assembly.GetTypes()
+                .FirstOrDefault(t => t.FullName == elementTypeName && typeof(IElement).IsAssignableFrom(t));
+
+            // If not found, fall back to RoverExtras.Playwright.Element
+            if (elementType == null)
+            {
+                elementType = typeof(Element);
+            }
+
+            foreach (var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<LocateByAttribute>();
+
+                if (attribute != null && typeof(IElement).IsAssignableFrom(property.PropertyType))
+                {
+                    // Create instance using the discovered element type
+                    var constructor = elementType.GetConstructor(new[] { typeof(PlaywrightAppDriver), typeof(LocatorType), typeof(string) });
+
+                    if (constructor == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Element type '{elementType.FullName}' must have a constructor with signature (PlaywrightAppDriver, LocatorType, string)");
+                    }
+
+                    IElement element = (IElement)constructor.Invoke(new object[] { driver, attribute.How, attribute.Using });
+                    property.SetValue(page, element);
+                }
+            }
+        }
     }
 }
