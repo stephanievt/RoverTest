@@ -2,7 +2,6 @@
 {
     public class RoverPageFactory
     {
-        internal string _className;
 
         // This is a string of KEYS which is the class name with the value 
         // of a fully qualified string to create the page instance.
@@ -13,16 +12,32 @@
         public RoverPageFactory(AppDriver appDriver)
         {
             AppDriver = appDriver;
-            Type derivedType = this.GetType();
-            _className = derivedType.Name;
+            RegisterPages();
+
         }
 
-        // New generic method to return the specific page type
-        public T GetPage<T>() where T : RoverPageBase
+        public object GetPage(string pageName)
         {
-            Type pageType = typeof(T);
-            return (T)Activator.CreateInstance(pageType, AppDriver);
+            if (!Pages.TryGetValue(pageName, out string fullyQualifiedTypeName))
+            {
+                throw new InvalidOperationException(
+                    $"Page '{pageName}' not found in registered pages. " +
+                    $"Available pages: {string.Join(", ", Pages.Keys)}");
+            }
+
+            Type pageType = Type.GetType(fullyQualifiedTypeName);
+
+            if (pageType == null)
+            {
+                throw new InvalidOperationException(
+                    $"Could not load type '{fullyQualifiedTypeName}' for page '{pageName}'.");
+            }
+
+            object pageInstance = Activator.CreateInstance(pageType, AppDriver);
+            return pageInstance;
         }
+
+
 
         /// <summary>
         /// Users of this framework will add pages (POM abstraction) to the list by class name
@@ -30,13 +45,15 @@
         /// </summary>
         public void RegisterPages()
         {
-            IEnumerable<Type> derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>();
+            // Only get derived types from the same assembly as the AppDriver
+            IEnumerable<Type> derivedTypes = RoverInternals.GetDerivedClasses<RoverPageBase>(AppDriver.GetType().Assembly);
 
             foreach (var type in derivedTypes)
             {
-                string typeFullName = type.FullName;
+                //string typeFullName = type.FullName;
+                string assemblyQualifiedName = type.AssemblyQualifiedName;
                 string typeName = type.Name;
-                Pages.Add(typeName, typeFullName);
+                Pages.Add(typeName, assemblyQualifiedName);
             }
         }
     }

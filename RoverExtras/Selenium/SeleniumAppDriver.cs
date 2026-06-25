@@ -7,8 +7,15 @@ namespace RoverExtras.Selenium
 {
     public class SeleniumAppDriver : AppDriver
     {
+        private readonly string _location;
         private readonly IWebDriver _webDriver;
         public sealed override object Driver { get; }
+        public override Task NavigateAsync()
+        {
+            _webDriver.Url = _location;
+            return Task.CompletedTask;
+        }
+
         public override void Dispose()
         {
             _webDriver.Close();
@@ -18,6 +25,7 @@ namespace RoverExtras.Selenium
 
         public SeleniumAppDriver(string location) : base(location)
         {
+            _location = location;
             IWebDriver webDriver = new ChromeDriver();
             _webDriver = webDriver;
             Driver = webDriver;
