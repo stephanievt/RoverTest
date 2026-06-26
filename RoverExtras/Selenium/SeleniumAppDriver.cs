@@ -22,6 +22,11 @@ namespace RoverExtras.Selenium
             _webDriver.Dispose();
         }
 
+        public override byte[] TakeScreenshot()
+        {
+            throw new NotImplementedException();
+        }
+
 
         public SeleniumAppDriver(string location) : base(location)
         {
