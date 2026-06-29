@@ -21,7 +21,7 @@ namespace RoverExtras.Playwright
             _locatorString = locatorString;
         }
 
-        private ILocator Locator
+        protected ILocator Locator
         {
             get
             {
