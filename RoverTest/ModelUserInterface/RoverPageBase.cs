@@ -14,13 +14,12 @@ namespace RoverTest.ModelUserInterface
     Justification = "Derived classes use fields initialized via reflection")]
     public abstract class RoverPageBase
     {
-        private readonly AppDriver _appDriver;
-
         public RoverPageAction LastRoverPageAction { get; set; }
 
         protected RoverPageBase(AppDriver appDriver)
         {
-            _appDriver = appDriver;
+            AppDriver = appDriver;
+            InitializeElements();
             RegisterRoverPageActions();
         }
 
@@ -35,7 +34,7 @@ namespace RoverTest.ModelUserInterface
         /// <summary>
         /// Gets the AppDriver for use in derived classes
         /// </summary>
-        protected AppDriver AppDriver => _appDriver;
+        protected AppDriver AppDriver { get; }
 
 
         public void RegisterRoverPageActions()
@@ -118,6 +117,38 @@ namespace RoverTest.ModelUserInterface
         {
             var screenshotBytes = AppDriver.TakeScreenshot();
             return Convert.ToBase64String(screenshotBytes);
+        }
+
+        /// <summary>
+        /// Initializes all properties decorated with locator attributes.
+        /// Supports multiple attribute types - each driver recognizes its own attributes.
+        /// </summary>
+        private void InitializeElements()
+        {
+            Type pageType = GetType();
+            PropertyInfo[] properties = pageType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var property in properties)
+            {
+                // Check if property type is an IElement derivative
+                if (!typeof(IElement).IsAssignableFrom(property.PropertyType))
+                    continue;
+
+                // Get all attributes on the property
+                var attributes = property.GetCustomAttributes(inherit: true);
+
+                // Try each attribute until the driver recognizes one
+                foreach (Attribute attribute in attributes)
+                {
+                    IElement element = AppDriver.CreateElement(property.PropertyType, attribute);
+
+                    if (element != null)
+                    {
+                        property.SetValue(this, element);
+                        break; // Element created successfully, move to next property
+                    }
+                }
+            }
         }
     }
 }

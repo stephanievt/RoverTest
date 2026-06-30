@@ -1,4 +1,5 @@
 ﻿using Microsoft.Playwright;
+using RoverExtras.Playwright.PlaywrightAttributes;
 using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.Playwright
@@ -54,5 +55,34 @@ namespace RoverExtras.Playwright
             await page.GotoAsync(Location);
 
         }
+
+        /// <summary>
+        /// Creates Playwright-specific element instances based on the [LocateBy] attribute.
+        /// Returns null if the attribute is not a LocateByAttribute (allowing other drivers to handle it).
+        /// </summary>
+        public override IElement CreateElement(Type elementInterfaceType, Attribute locatorAttribute)
+        {
+            // Only process LocateBy attributes - ignore others (FindsBy, etc.)
+            if (locatorAttribute is not LocateByAttribute locateBy)
+                return null;
+
+            // Map interface types to Playwright concrete implementations
+            if (elementInterfaceType == typeof(ITextbox))
+            {
+                return new Textbox(this, locateBy.How, locateBy.Using);
+            }
+            else if (elementInterfaceType == typeof(IButton))
+            {
+                return new Button(this, locateBy.How, locateBy.Using);
+            }
+            else if (elementInterfaceType == typeof(IElement))
+            {
+                return new Element(this, locateBy.How, locateBy.Using);
+            }
+
+            throw new NotSupportedException(
+                $"Element type '{elementInterfaceType.Name}' is not supported by Playwright driver");
+        }
+        
     }
 }

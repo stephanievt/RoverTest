@@ -19,5 +19,15 @@
         public abstract void Dispose();
 
         public abstract byte[] TakeScreenshot();
+
+        /// <summary>
+        /// Creates an element instance based on the interface type and locator attribute.
+        /// Each driver implementation recognizes its own attribute types (FindsBy, LocateBy, etc.)
+        /// </summary>
+        /// <param name="elementInterfaceType">The interface type (IElement, ITextbox, IButton, etc.)</param>
+        /// <param name="locatorAttribute">The attribute containing locator information (driver-specific)</param>
+        /// <returns>Concrete element instance, or null if attribute is not recognized by this driver</returns>
+        public abstract IElement? CreateElement(Type elementInterfaceType, Attribute locatorAttribute);
+
     }
 }
