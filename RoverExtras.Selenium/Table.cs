@@ -4,11 +4,12 @@ using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.Selenium
 {
-    public class Grid(AppDriver appDriver, By by) : Element(appDriver, by), IGrid
+    public class Table(AppDriver appDriver, By by) : Element(appDriver, by), ITable
     {
 
 
-        public Element Table { get; set; } = new Element(appDriver, by);
+        //TODO: Do I even need this? This may go away with new classes.
+        public Element TableElement { get; set; } = new Element(appDriver, by);
 
 
         public Elements Rows
@@ -16,7 +17,7 @@ namespace RoverExtras.Selenium
             get
             {
                 By by = By.CssSelector("tbody > tr");
-                Elements rows = new Elements(appDriver, by, Table);
+                Elements rows = new Elements(appDriver, by, TableElement);
                 return rows;
             }
         }
@@ -35,6 +36,11 @@ namespace RoverExtras.Selenium
             By by = By.TagName("td");
             
             return new Element(appDriver, by, localRow);
+        }
+
+        public IElements GetCellsFromColumn(int columnIndex)
+        {
+            throw new NotImplementedException();
         }
 
         public IElement GetCell(Element row, int columnIndex)

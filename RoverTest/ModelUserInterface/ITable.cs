@@ -1,11 +1,13 @@
 ﻿namespace RoverTest.ModelUserInterface
 {
-    public interface IGrid : IElement
+    public interface ITable : IElement
     {
+
         public IElement GetRow(int rowIndex);
 
         public IElement GetCell(IElement row, int columnIndex);
 
+        public IElements GetCellsFromColumn(int columnIndex);
     }
 }
 

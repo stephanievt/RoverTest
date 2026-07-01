@@ -1,7 +1,5 @@
 ﻿using Microsoft.Playwright;
-using RoverExtras.Playwright.PlaywrightAttributes;
 using RoverTest.ModelUserInterface;
-using System.Reflection;
 
 namespace RoverExtras.Playwright
 {
@@ -10,7 +8,7 @@ namespace RoverExtras.Playwright
         private readonly PlaywrightAppDriver _driver;
         private ILocator _locator;
         private readonly IPage _page;
-        private readonly LocatorType _locatorType;
+        private readonly LocatorType? _locatorType;
         private readonly string _locatorString;
 
         public Element(PlaywrightAppDriver driver, LocatorType locatorType, string locatorString)
@@ -21,7 +19,32 @@ namespace RoverExtras.Playwright
             _locatorString = locatorString;
         }
 
-        protected ILocator Locator
+        // Parent-aware constructor for child elements
+        protected Element(Element parent, string childLocator)
+        {
+            _driver = parent._driver;
+            _page = parent._page;
+            _locator = parent.Locator.Locator(childLocator);
+            _locatorType = null;
+            _locatorString = childLocator;
+        }
+
+        // Internal constructor for indexed collection items
+        internal Element(Element parent, string childLocator, int index)
+        {
+            _driver = parent._driver;
+            _page = parent._page;
+            _locator = parent.Locator.Locator(childLocator).Nth(index);
+            _locatorType = null;
+            _locatorString = $"{childLocator}[{index}]";
+        }
+
+        // This is playwright specific so that 
+        // elements that inherit can locate as 
+        // with table.
+        public IPage Page => _page;
+
+        protected internal ILocator Locator
         {
             get
             {
@@ -35,6 +58,11 @@ namespace RoverExtras.Playwright
 
         private ILocator CreateLocator()
         {
+            if (_locatorType == null)
+            {
+                throw new InvalidOperationException("Cannot create locator without a locator type");
+            }
+
             return _locatorType switch
             {
                 LocatorType.Role => _page.GetByRole(ParseRole(_locatorString)),
@@ -99,7 +127,5 @@ namespace RoverExtras.Playwright
         }
 
         public string Text => Locator.TextContentAsync().GetAwaiter().GetResult() ?? string.Empty;
-
-
     }
 }

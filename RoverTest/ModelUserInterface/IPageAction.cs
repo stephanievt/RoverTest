@@ -4,6 +4,10 @@
     {
         string Name { get; }
 
-        bool Execute();
+        void Execute();
+
+        bool Pass { get; }
+
+        string ReportableDetails { get; }
     }
 }
