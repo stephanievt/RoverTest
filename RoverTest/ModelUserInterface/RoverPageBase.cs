@@ -14,13 +14,11 @@ namespace RoverTest.ModelUserInterface
     Justification = "Derived classes use fields initialized via reflection")]
     public abstract class RoverPageBase
     {
-        private readonly AppDriver _appDriver;
-
         public RoverPageAction LastRoverPageAction { get; set; }
 
         protected RoverPageBase(AppDriver appDriver)
         {
-            _appDriver = appDriver;
+            AppDriver = appDriver;
             RegisterRoverPageActions();
         }
 
@@ -35,7 +33,7 @@ namespace RoverTest.ModelUserInterface
         /// <summary>
         /// Gets the AppDriver for use in derived classes
         /// </summary>
-        protected AppDriver AppDriver => _appDriver;
+        protected AppDriver AppDriver { get; }
 
 
         public void RegisterRoverPageActions()
@@ -119,5 +117,7 @@ namespace RoverTest.ModelUserInterface
             var screenshotBytes = AppDriver.TakeScreenshot();
             return Convert.ToBase64String(screenshotBytes);
         }
+
+        
     }
 }

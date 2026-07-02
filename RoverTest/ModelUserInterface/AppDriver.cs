@@ -19,5 +19,8 @@
         public abstract void Dispose();
 
         public abstract byte[] TakeScreenshot();
+
+        
+
     }
 }

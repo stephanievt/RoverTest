@@ -8,24 +8,12 @@ namespace RoverExtras.Selenium
     {
         private readonly List<Element> elements = [];
 
-        public Elements(AppDriver appDriver, By by)
-        {
-            IWebDriver webDriver = (IWebDriver)appDriver.Driver;
-            IReadOnlyCollection<IWebElement> webElements = webDriver.FindElements(by);
-            foreach (IWebElement webElement in webElements)
-            {
-                Element currentElement = new Element(appDriver, webElement, by);
-                elements.Add(currentElement);
-            }
-
-        }
-
         public Elements(AppDriver appDriver, By by, Element parentElement)
         {
             IReadOnlyCollection<IWebElement> webElements = parentElement.WebElement.FindElements(by);
             foreach (IWebElement webElement in webElements)
             {
-                Element currentElement = new Element(appDriver, webElement, by);
+                Element currentElement = new Element(appDriver, webElement);
                 elements.Add(currentElement);
             }
         }

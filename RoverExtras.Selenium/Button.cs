@@ -9,7 +9,7 @@ namespace RoverExtras.Selenium
     // that demonstrates identifying buttons as a good idea from the beginning.
     // A button click is different from another element click for focus setting.
     //public class Button(AppDriver driver) : Element(driver), IButton
-    public class Button(AppDriver appDriver, By by) : Element(appDriver, by), IButton;
+    public class Button(SeleniumAppDriver appDriver, By by) : Element(appDriver, by), IButton;
 
     
 }
