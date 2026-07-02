@@ -1,5 +1,4 @@
 ﻿using Microsoft.Playwright;
-using RoverExtras.Playwright.PlaywrightAttributes;
 using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.Playwright
@@ -56,89 +55,7 @@ namespace RoverExtras.Playwright
 
         }
 
-        /// <summary>
-        /// Creates Playwright-specific element instances based on the [LocateBy] attribute.
-        /// Uses reflection to dynamically find concrete implementations in the RoverExtras.Playwright namespace.
-        /// Returns null if the attribute is not a LocateByAttribute (allowing other drivers to handle it).
-        /// </summary>
-        public override IElement CreateElement(Type elementInterfaceType, Attribute locatorAttribute)
-        {
-            // Only process LocateBy attributes - ignore others (FindsBy, etc.)
-            if (locatorAttribute is not LocateByAttribute locateBy)
-                return null;
-
-            // Find concrete implementation in this assembly that implements the interface
-            var concreteType = FindConcreteElementType(elementInterfaceType);
-
-            if (concreteType == null)
-            {
-                throw new NotSupportedException(
-                    $"Could not find a concrete Playwright element type that implements '{elementInterfaceType.Name}'. " +
-                    $"Ensure you have a class in the RoverExtras.Playwright namespace that implements this interface.");
-            }
-
-            // Get the constructor: (PlaywrightAppDriver, LocatorType, string)
-            var constructor = concreteType.GetConstructor(new[]
-            {
-                typeof(PlaywrightAppDriver),
-                typeof(LocatorType),
-                typeof(string)
-            });
-
-            if (constructor == null)
-            {
-                throw new InvalidOperationException(
-                    $"Concrete type '{concreteType.Name}' does not have a constructor with signature " +
-                    $"({nameof(PlaywrightAppDriver)}, {nameof(LocatorType)}, string)");
-            }
-
-            // Invoke the constructor to create the element
-            return (IElement)constructor.Invoke(new object[] { this, locateBy.How, locateBy.Using });
-        }
-
-        /// <summary>
-        /// Finds a concrete class in this assembly that implements the specified interface.
-        /// Prefers classes in the RoverExtras.Playwright namespace.
-        /// </summary>
-        private Type FindConcreteElementType(Type interfaceType)
-        {
-            var assembly = typeof(PlaywrightAppDriver).Assembly;
-            var ourNamespace = typeof(PlaywrightAppDriver).Namespace;
-
-            // Find all types in this assembly that:
-            // 1. Are classes (not interfaces or abstracts)
-            // 2. Implement the target interface
-            // 3. Are in the same namespace as this driver (RoverExtras.Playwright)
-            var candidateTypes = assembly.GetTypes()
-                .Where(t => t.IsClass
-                    && !t.IsAbstract
-                    && interfaceType.IsAssignableFrom(t)
-                    && t.Namespace == ourNamespace)
-                .ToList();
-
-            // If we found exactly one, use it
-            if (candidateTypes.Count == 1)
-                return candidateTypes[0];
-
-            // If we found multiple, prefer the one with the shortest name 
-            // (e.g., Element over TableRow for IElement)
-            if (candidateTypes.Count > 1)
-            {
-                // For IElement interface, prefer Element class specifically
-                if (interfaceType == typeof(IElement))
-                {
-                    var elementType = candidateTypes.FirstOrDefault(t => t.Name == "Element");
-                    if (elementType != null)
-                        return elementType;
-                }
-
-                // Otherwise return the first match (they're all valid)
-                return candidateTypes[0];
-            }
-
-            // No matches found
-            return null;
-        }
+        
 
     }
 }

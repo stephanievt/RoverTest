@@ -2,7 +2,6 @@
 using OpenQA.Selenium.Support.UI;
 using RoverTest;
 using RoverTest.ModelUserInterface;
-using SeleniumExtras.WaitHelpers;
 
 namespace RoverExtras.Selenium;
 
@@ -15,15 +14,6 @@ public class Element : IElement
 
     public bool Exists { get; private set; }
 
-    // For the ELEMENTS Collection ONLY
-    internal Element(AppDriver appDriver, IWebElement webElement, By by)
-    {
-        ByFinder = by;
-        WebDriver = RoverInternals.GetTypedObject<IWebDriver>(appDriver.Driver);
-        WebElement = webElement;
-        Exists = true;
-
-    }
     public Element(AppDriver appDriver, By by, Element parent)
     {
         
@@ -32,7 +22,11 @@ public class Element : IElement
         WebDriver = RoverInternals.GetTypedObject<IWebDriver>(appDriver.Driver);
 
         WebDriverWait wait = new WebDriverWait(WebDriver, TimeSpan.FromSeconds(30)); // Waits up to 10 seconds
-        WebElement = wait.Until(ExpectedConditions.ElementToBeClickable(by));
+        WebElement= wait.Until(drv =>
+        {
+            var el = drv.FindElement(by);
+            return el.Displayed && el.Enabled ? el : null;
+        });
         try
         {
             WebElement = webParent.FindElement(by);
@@ -50,7 +44,19 @@ public class Element : IElement
         WebDriver = RoverInternals.GetTypedObject<IWebDriver>(appDriver.Driver);
 
         WebDriverWait wait = new WebDriverWait(WebDriver, TimeSpan.FromSeconds(30)); // Waits up to 10 seconds
-        WebElement = wait.Until(ExpectedConditions.ElementToBeClickable(by));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+        WebElement = wait.Until(drv =>
+        {
+            try
+            {
+                var el = drv.FindElement(by);
+                return el.Displayed && el.Enabled ? el : null;
+            }
+            catch (StaleElementReferenceException)
+            {
+                return null; // Will retry
+            }
+        });
         try
         {
             WebElement = WebDriver.FindElement(by);
@@ -63,9 +69,13 @@ public class Element : IElement
         
     }
 
-   
+    internal Element(AppDriver appDriver, IWebElement webElement)
+    {
+        WebElement = webElement;
+        WebDriver = RoverInternals.GetTypedObject<IWebDriver>(appDriver.Driver);
+        Exists = true;
+    }
 
-    
     public void Click()
     {
         WebElement.Click();

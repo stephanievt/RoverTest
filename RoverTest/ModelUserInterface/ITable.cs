@@ -2,12 +2,9 @@
 {
     public interface ITable : IElement
     {
+        public IElement GetCell(int row, int columnIndex);
 
-        public IElement GetRow(int rowIndex);
-
-        public IElement GetCell(IElement row, int columnIndex);
-
-        public IElements GetCellsFromColumn(int columnIndex);
+        public IElements GetCellsFromColumn(int colIndex);
     }
 }
 

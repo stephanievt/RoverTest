@@ -1,53 +1,57 @@
 ﻿using OpenQA.Selenium;
 using RoverTest.ModelUserInterface;
-#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace RoverExtras.Selenium
 {
-    public class Table(AppDriver appDriver, By by) : Element(appDriver, by), ITable
+    public class Table : Element, ITable
     {
-
-
-        //TODO: Do I even need this? This may go away with new classes.
-        public Element TableElement { get; set; } = new Element(appDriver, by);
-
-
-        public Elements Rows
+        private SeleniumAppDriver _appDriver;
+        public Table(SeleniumAppDriver appDriver, By by, Element parent) : base(appDriver, by, parent)
         {
-            get
-            {
-                By by = By.CssSelector("tbody > tr");
-                Elements rows = new Elements(appDriver, by, TableElement);
-                return rows;
-            }
+            _appDriver = appDriver;
         }
 
-        
-        public IElement GetRow(int rowIndex)
+        public Table(SeleniumAppDriver appDriver, By by) : base(appDriver, by)
         {
-
-            return Rows[rowIndex];
-
+            _appDriver = appDriver;
         }
 
-        public IElement GetCell(IElement row, int columnIndex)
+        /// <summary>
+        /// While the underlying Selenium uses 1-based indexing,
+        /// this is handled in the method for compatibility with the
+        /// 0-based indexing we are accustomed to.
+        /// </summary>
+        /// <param name="rowIndex"></param>
+        /// <param name="colIndex"></param>
+        /// <returns></returns>
+        public IElement GetCell(int rowIndex, int colIndex)
         {
-            Element localRow = (Element)row;
-            By by = By.TagName("td");
-            
-            return new Element(appDriver, by, localRow);
+            // I am doing each var separately for readability.
+            // I could make this fewer lines, and choose not to.
+            rowIndex += 1; // XPath positions start at 1
+            colIndex += 1;
+            string cssSelector = $"tr:nth-child({rowIndex}) > :nth-child({colIndex})";
+            By by = By.CssSelector(cssSelector);
+            Element ele = new Element(_appDriver, by, this);
+            return ele;
         }
 
-        public IElements GetCellsFromColumn(int columnIndex)
+        /// <summary>
+        /// While the underlying Selenium uses 1-based indexing,
+        /// this is handled in the method for compatibility with the
+        /// 0-based indexing we are accustomed to.
+        /// </summary>
+        /// <param name="colIndex"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public IElements GetCellsFromColumn(int colIndex)
         {
-            throw new NotImplementedException();
-        }
-
-        public IElement GetCell(Element row, int columnIndex)
-        {
-            By by = By.TagName("td");
-            Elements element = new Elements(appDriver, by, row);
-            return element[columnIndex];
+            colIndex = colIndex + 1;
+            //string cssSelector = $"tr > :nth-child({colIndex})";
+            string cssSelector = $"tbody > tr > :nth-child({colIndex})";
+            By by = By.CssSelector(cssSelector);
+            Elements elements = new Elements(_appDriver, by, this);
+            return elements;
         }
     }
 }

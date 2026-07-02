@@ -19,26 +19,6 @@ namespace RoverExtras.Playwright
             _locatorString = locatorString;
         }
 
-        // Parent-aware constructor for child elements
-        protected Element(Element parent, string childLocator)
-        {
-            _driver = parent._driver;
-            _page = parent._page;
-            _locator = parent.Locator.Locator(childLocator);
-            _locatorType = null;
-            _locatorString = childLocator;
-        }
-
-        // Internal constructor for indexed collection items
-        internal Element(Element parent, string childLocator, int index)
-        {
-            _driver = parent._driver;
-            _page = parent._page;
-            _locator = parent.Locator.Locator(childLocator).Nth(index);
-            _locatorType = null;
-            _locatorString = $"{childLocator}[{index}]";
-        }
-
         // This is playwright specific so that 
         // elements that inherit can locate as 
         // with table.

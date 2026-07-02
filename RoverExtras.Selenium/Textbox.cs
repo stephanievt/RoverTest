@@ -4,7 +4,7 @@ using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.Selenium;
 
-public class Textbox(AppDriver appDriver, By by) : Element(appDriver, by), ITextbox
+public class Textbox(SeleniumAppDriver appDriver, By by) : Element(appDriver, by), ITextbox
 {
     public void SendKeys(string entryValue)
     {
