@@ -8,9 +8,16 @@ namespace RoverExtras.Playwright
         private readonly List<Element> _elements = [];
 
         // Internal constructor for finding multiple elements from a parent element
-        public Elements(Element parentElement, string childLocator)
+        public Elements(Element parentElement, LocatorType locatorType, string locatorString)
         {
-            throw new NotImplementedException();
+            var locators = parentElement.Locator.Locator(locatorString).AllAsync().GetAwaiter().GetResult();
+            PlaywrightAppDriver pwAppDriver = parentElement.PlaywrightAppDriver;
+            foreach (var locator in locators)
+            {
+                ;
+                Element currentElement = new Element(pwAppDriver, locator);
+                _elements.Add(currentElement);
+            }
         }
 
         public int Count => _elements.Count;

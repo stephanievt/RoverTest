@@ -98,5 +98,49 @@ public class Element : IElement
 
     public bool Visible => WebElement.Displayed;
 
-    
+    //*** START: New wait methods added to replace Thread.Sleep usage ***
+    /// <summary>
+    /// Waits for the element to be in a state ready for interaction (enabled and displayed).
+    /// </summary>
+    /// <param name="timeoutSeconds">Maximum time to wait in seconds. Default is 10.</param>
+    protected void WaitUntilReady(int timeoutSeconds = 10)
+    {
+        WebDriverWait wait = new WebDriverWait(WebDriver, TimeSpan.FromSeconds(timeoutSeconds));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+        wait.Until(_ =>
+        {
+            try
+            {
+                return WebElement.Displayed && WebElement.Enabled;
+            }
+            catch (StaleElementReferenceException)
+            {
+                return false;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Waits for a custom condition to be true for this element.
+    /// </summary>
+    /// <param name="condition">The condition to wait for.</param>
+    /// <param name="timeoutSeconds">Maximum time to wait in seconds. Default is 10.</param>
+    protected void WaitUntil(Func<IWebElement, bool> condition, int timeoutSeconds = 10)
+    {
+        WebDriverWait wait = new WebDriverWait(WebDriver, TimeSpan.FromSeconds(timeoutSeconds));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+        wait.Until(_ =>
+        {
+            try
+            {
+                return condition(WebElement);
+            }
+            catch (StaleElementReferenceException)
+            {
+                return false;
+            }
+        });
+    }
+    //*** END: New wait methods added ***
+
 }

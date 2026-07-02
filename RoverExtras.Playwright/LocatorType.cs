@@ -8,6 +8,7 @@
         Placeholder,
         AltText,
         Title,
-        TestId
+        TestId,
+        LocatorMethod
     }
 }

@@ -11,6 +11,11 @@ public class Textbox(SeleniumAppDriver appDriver, By by) : Element(appDriver, by
         if (string.IsNullOrWhiteSpace(entryValue))
             throw new AmbiguousImplementationException("No value sent to send keys. No keys to send.");
         WebElement.Clear();
+        //TODO: This would make a great documentation example
+        // to support the abstraction. Put a thread.sleep here
+        // then show how you can fix it.
+        WaitUntilReady();
         WebElement.SendKeys(entryValue);
+        
     }
 }

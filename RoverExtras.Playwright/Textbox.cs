@@ -1,5 +1,4 @@
-﻿using Microsoft.Playwright;
-using RoverTest.ModelUserInterface;
+﻿using RoverTest.ModelUserInterface;
 
 namespace RoverExtras.Playwright
 {
@@ -8,27 +7,11 @@ namespace RoverExtras.Playwright
     {
         public void SendKeys(string entryValue)
         {
-            Locator.WaitForAsync(new LocatorWaitForOptions
-            {
-                State = WaitForSelectorState.Visible,
-                Timeout = 5000
-            }).GetAwaiter().GetResult();
-            //*** End wait for element ***
-
-            //*** Clear existing value before filling ***
+            WaitUntilEditable();
             Locator.ClearAsync().GetAwaiter().GetResult();
-            //*** End clear ***
-
-            // Fill the textbox with the new value
+            WaitUntilEditable();
             Locator.FillAsync(entryValue).GetAwaiter().GetResult();
 
-            //*** Verify the value was actually set ***
-            var actualValue = Locator.InputValueAsync().GetAwaiter().GetResult();
-            if (actualValue != entryValue)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to set textbox value. Expected: '{entryValue}', Actual: '{actualValue}'");
-            }
         }
     }
 }
